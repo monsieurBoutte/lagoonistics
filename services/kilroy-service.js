@@ -13,7 +13,7 @@ async function getKilroyData() {
   const dataString = regexMatch && regexMatch[1];
   let dataObject;
 
-  console.log('Parsing kilroy response...');
+  console.log("Parsing kilroy response...");
   try {
     dataObject = JSON.parse(dataString);
   } catch (error) {
@@ -24,7 +24,7 @@ async function getKilroyData() {
 }
 
 function transformKilroyData(data) {
-  console.log('Transforming data');
+  console.log("Transforming data");
   const result = data.mlist.reduce((prev, current) => {
     let { name, alt_name, lat, lon } = current;
     let data = current.mea_list.map(({ label, value }) => {
@@ -33,7 +33,13 @@ function transformKilroyData(data) {
       return { label, valu };
     });
 
-    prev.push({ data, name, alt_name, lat, lon });
+    prev.push({
+      data,
+      name,
+      alt_name,
+      lat,
+      long: lon
+    });
 
     return prev;
   }, []);
