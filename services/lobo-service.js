@@ -6,10 +6,10 @@ const xml2js = require('xml2js');
 const LOBO_BASE_URL = "http://fau-hboi.loboviz.com/latest/";
 const LOBO_IRL_NODE_IDS = ['0054', '0035', '0056', '0055', '0062', '0061'];
 
-var sensorRequests = LOBO_IRL_NODE_IDS.map ( id => axios.get(LOBO_BASE_URL + id + '.kml') );
+const sensorRequests = LOBO_IRL_NODE_IDS.map ( id => axios.get(LOBO_BASE_URL + id + '.kml') );
 
 function parseSensor(response) {
-  var sensor = {};
+  let sensor = {};
   xml2js.parseString(response.data, function (err, result) {
 
     // Get the relevant sensor data from the xml
@@ -24,13 +24,13 @@ function parseSensor(response) {
     sensor.lat = parseFloat(point[1]);
 
     // Get the sensory data (temp, salinity, turbidity, etc.)
-    var sensoryData = [];
-    var tableHtml = sensorData.description[0].trim();
-    var tableParser = cheerio.load(tableHtml);
+    let sensoryData = [];
+    const tableHtml = sensorData.description[0].trim();
+    const tableParser = cheerio.load(tableHtml);
     cheerioTableparser(tableParser);
     const table = tableParser("table table").parsetable();
     const LABELS = 0, VALUES = 1, UNITS = 2;
-    for (var col = 1; col < table[0].length; col++) {
+    for (let col = 1; col < table[0].length; col++) {
       sensoryData.push({
         'label':  cheerio.load(table[LABELS][col]).text(),
         'value': cheerio.load(table[VALUES][col]).text(),
@@ -42,15 +42,18 @@ function parseSensor(response) {
   return sensor;
 };
 
-axios.all(sensorRequests).then(response => {
-  const sensors = response.reduce((acc, current) => {
-    return [
-      ...acc,
-      parseSensor(current)
-    ]
-  }, []);
-  console.log(JSON.stringify(sensors, null, 2));
-  return sensors;
-}).catch(err => {
-  console.log(err);
-});
+const getLoboSensors = function(res) {
+  axios.all(sensorRequests).then(response => {
+    const sensors = response.reduce((acc, current) => {
+      return [
+        ...acc,
+        parseSensor(current)
+      ]
+    }, []);
+    res(sensors);
+  }).catch(err => {
+    console.log(err);
+  });
+}
+
+module.exports = getLoboSensors;
