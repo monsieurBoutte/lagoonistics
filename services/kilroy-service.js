@@ -28,9 +28,9 @@ function transformKilroyData(data) {
   const result = data.mlist.reduce((prev, current) => {
     let { name, alt_name, lat, lon } = current;
     let data = current.mea_list.map(({ label, value }) => {
-      var valu = cheerio.load(value).text();
-      valu = parseFloat(valu);
-      return { label, valu };
+      var value = cheerio.load(value).text();
+      value = parseFloat(value);
+      return { label, value };
     });
 
     prev.push({
