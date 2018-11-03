@@ -1,6 +1,9 @@
 const express = require('express');
 const fetchSensorInformation = require('../services/saintJohn-service');
+const cors = require('cors');
 const app = express();
+
+app.use(cors());
 
 const axios = require('axios');
 
