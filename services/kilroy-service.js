@@ -5,25 +5,33 @@ const KILROY_WEB = "http://api.kilroydata.org/public/";
 const KILROY_DATA_REGEX = /d\s\=\s(.*)\;/;
 
 // Get HTML
-axios.get(KILROY_WEB).then(({ data }) => {
-  const regexMatch = data.match(KILROY_DATA_REGEX);
-  const dataString = regexMatch && regexMatch[1];
+const getKilroySensors = function(res) {
+  axios.get(KILROY_WEB).then(({ data }) => {
+    const regexMatch = data.match(KILROY_DATA_REGEX);
+    const dataString = regexMatch && regexMatch[1];
 
-  if (dataString) {
-    const data = JSON.parse(dataString);
-    const result = data.mlist.reduce((prev, current) => {
-      let data = current.mea_list.map(({ label, value }) => {
-        return { label, value };
-      });
-      let { name, alt_name, lat, lon } = current;
+    if (dataString) {
+      const data = JSON.parse(dataString);
+      const result = data.mlist.reduce((prev, current) => {
+        let data = current.mea_list.map(({ label, value }) => {
 
-      prev.push({ data, name, alt_name, lat, lon });
+          var valu = cheerio.load(value).text();
+          valu = parseFloat(valu);
+          return { label, valu };
+        });
+        let { name, alt_name, lat, lon } = current;
 
-      return prev;
-    }, []);
+        prev.push({ data, name, alt_name, lat, lon });
 
-    console.log({ result });
-  } else {
-    console.log("NO MATCH");
-  }
-});
+        return prev;
+      }, []);
+
+      console.log({ result });
+      res({result})
+    } else {
+      console.log("NO MATCH");
+    }
+  });
+}
+
+module.exports = getKilroySensors;

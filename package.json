@@ -12,6 +12,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
-    "express": "^4.16.4"
+    "cheerio-tableparser": "^1.0.1",
+    "express": "^4.16.4",
+    "xml2js": "^0.4.19"
   }
 }
