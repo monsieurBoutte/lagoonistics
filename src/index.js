@@ -11,10 +11,9 @@ app.get('/', (req, res) => {
   res.send('response from server');
 });
 
-app.get('/lobo', (req, res) => {
-  getLoboSensors( (response) => {
-    res.send(response);
-  });
+app.get('/lobo', async (req, res) => {
+  const result = await getLoboSensors();
+  res.send(result);
 })
 
 app.get('/killroy', async (req, res) => {
