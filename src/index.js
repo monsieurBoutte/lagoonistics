@@ -3,6 +3,7 @@ const fetchSensorInformation = require('../services/saintJohn-service');
 const app = express();
 
 const axios = require('axios');
+const saveSnapshot = require('../services/snapshot-service');
 
 const getLoboSensors = require('../services/lobo-service.js');
 const getKilroySensors = require('../services/kilroy-service.js');
@@ -14,6 +15,8 @@ app.get('/', (req, res) => {
 app.get('/lobo', async (req, res) => {
   const result = await getLoboSensors();
   res.send(result);
+
+  result.forEach( snapshot => saveSnapshot(snapshot) );
 })
 
 app.get('/killroy', async (req, res) => {
