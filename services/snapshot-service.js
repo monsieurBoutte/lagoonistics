@@ -43,7 +43,7 @@ async function saveSnapshot(snapshot) {
 // Given a snapshot, returns the snapshot immediately preceeding it or nil if none exists
 async function getPrevious(snapshot) {
   const id = snapshot.sensorId
-  const previous = await getLatestSnapshotBySensorId(snapshot.sensorId);
+  const previous = await getLatestSnapshotBySensorId(snapshot.sensorId, snapshot.source);
   return previous
 }
 
@@ -64,14 +64,14 @@ async function getSnapshot(filename) {
   });
 }
 
-async function getLatestSnapshotBySensorId(sensorId) {
+async function getLatestSnapshotBySensorId(sensorId, sourceSuffix) {
   return new Promise((resolve, reject) => {
     // Get contents of snapshots folder
     fs.readdir(SNAPSHOT_DIR, function(err, items) {
       if (err) reject(err);
 
       // Get snapshots by sensorId
-      items = items.filter(item => item.includes(sensorId));
+      items = items.filter(item => item.includes(sensorId) && item.startsWith(sourceSuffix));
 
       // Sort by date
       items.sort( (a,b) => {
