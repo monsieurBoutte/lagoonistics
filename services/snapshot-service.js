@@ -5,9 +5,15 @@ const SNAPSHOT_DIR = 'snapshots/';
 // Saves the snapshot in a new file in the snapshots dir if not exists already
 async function saveSnapshot(snapshot) {
   // Ensure file doesn't collide with another snapshot first
-  const existingSnapshot = await getSnapshot(snapshot.filename);
-  if (existingSnapshot) return
-
+  try {
+    const existingSnapshot = await getSnapshot(snapshot.filename);
+    if (existingSnapshot) {
+      return existingSnapshot;
+    }
+  } catch (e) {
+    
+  }
+  
   // See if there's a previous snapshot to link this new one to it
   const previousSnapshot = await getPrevious(snapshot);
   if (previousSnapshot) {
@@ -15,13 +21,23 @@ async function saveSnapshot(snapshot) {
     console.log(previousSnapshot);
     snapshot.previous = previousSnapshot;
     console.log(snapshot.previous);
+
+    console.log("About to call getsnapshot on")
+    console.log(previousSnapshot)
+    // Compute deltas
+    const prevReadings = await getSnapshot(previousSnapshot);
+
+    console.log(prevReadings);
+
+    for (var i = 0; i < snapshot.data.length; i++) {
+      snapshot.data[i].delta = parseFloat(snapshot.data[i].value) - parseFloat(prevReadings.data[i].value);
+    }
   }
 
   // Convert to JSON and write to disk
   const data = JSON.stringify(snapshot);
   const error = await fs.writeFile(SNAPSHOT_DIR + snapshot.filename, data);
-  //TODO: Handle error
-  return error;
+  return snapshot;
 }
 
 // Given a snapshot, returns the snapshot immediately preceeding it or nil if none exists
@@ -33,14 +49,19 @@ async function getPrevious(snapshot) {
 
 // Gets a snapshot by filename
 async function getSnapshot(filename) {
-  try {
-    var snapshot = await fs.open(SNAPSHOT_DIR + filename, 'a');
-    snapshot = JSON.parse(snapshot)
-  } catch(e) {
-    return null
-  }
-
-  return snapshot;
+  return new Promise((resolve, reject) => {
+    console.log("trying to open " + filename);
+    fs.readFile(SNAPSHOT_DIR + filename, function(err, item) {
+      if (err) {
+        reject(err);
+        return
+      }
+      var snapshot = JSON.parse(item);
+      console.log("Here's the old snapshot")
+      console.log(snapshot);
+      resolve(snapshot);
+    });
+  });
 }
 
 async function getLatestSnapshotBySensorId(sensorId) {
@@ -55,7 +76,10 @@ async function getLatestSnapshotBySensorId(sensorId) {
       // Sort by date
       items.sort( (a,b) => {
         return parseFloat(a.replace(/[^0-9]/g, '')) - parseFloat(b.replace(/[^0-9]/g, ''))
-      });
+      }).reverse();
+
+      console.log("Sorted list: ");
+      console.log(items);
 
       resolve(items[0]);
     });

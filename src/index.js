@@ -1,3 +1,4 @@
+
 const express = require('express');
 const fetchSensorInformation = require('../services/saintJohn-service');
 const cors = require('cors');
@@ -17,9 +18,9 @@ app.get('/', (req, res) => {
 
 app.get('/lobo', async (req, res) => {
   const result = await getLoboSensors();
-  res.send(result);
-
-  result.forEach( snapshot => saveSnapshot(snapshot) );
+  const resultsPromise = result.map(saveSnapshot);
+  var snapshots = await Promise.all(resultsPromise);
+  res.send(snapshots);
 })
 
 app.get('/killroy', async (req, res) => {
