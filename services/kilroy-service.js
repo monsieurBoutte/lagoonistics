@@ -49,7 +49,7 @@ function transformKilroyData(data) {
 
       var properLabel = shouldBe[labelString] || labelString
 
-      return { properLabel, numericalValue, units };
+      return { label: properLabel, value: numericalValue, units };
     });
 
     var date = new Date();
