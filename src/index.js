@@ -25,7 +25,9 @@ app.get('/lobo', async (req, res) => {
 
 app.get('/killroy', async (req, res) => {
   const result = await getKilroySensors();
-  res.send(result);
+  const resultsPromise = result.map(saveSnapshot);
+  var snapshots = await Promise.all(resultsPromise);
+  res.send(snapshots);
 });
 
 app.listen(4010, () => console.log('app listening on port 4010!'));
