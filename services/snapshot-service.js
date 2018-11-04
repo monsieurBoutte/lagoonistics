@@ -13,8 +13,8 @@ async function saveSnapshot(snapshot) {
   if (previousSnapshot) {
     console.log("Found previous snapshot -------");
     console.log(previousSnapshot);
-    snapshot.previous = previousSnapshot
-    console.log(snapshot.previous)
+    snapshot.previous = previousSnapshot;
+    console.log(snapshot.previous);
   }
 
   // Convert to JSON and write to disk
