@@ -15,7 +15,7 @@
     "cheerio-tableparser": "^1.0.1",
     "cors": "^2.8.4",
     "express": "^4.16.4",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",
     "xml2js": "^0.4.19"
